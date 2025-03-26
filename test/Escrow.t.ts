@@ -24,7 +24,7 @@ describe("Escrow", () => {
     let transaction = await realEstate
       .connect(seller)
       .mintNFT(
-        buyer.address,
+        seller.address,
         "https://ipfs.io/ipfs/QmTudSYeM7mz3PkYEWXWqPjomRPHogcMFSq7XAvsvsgAPS"
       );
     await transaction.wait();
@@ -81,7 +81,7 @@ describe("Listing", () => {
     let transaction = await realEstate
       .connect(seller)
       .mintNFT(
-        buyer.address,
+        seller.address,
         "https://ipfs.io/ipfs/QmTudSYeM7mz3PkYEWXWqPjomRPHogcMFSq7XAvsvsgAPS"
       );
     await transaction.wait();
@@ -98,8 +98,13 @@ describe("Listing", () => {
   });
 
   describe("Deployment", () => {
+    it("updates as listed", async () => {
+      const result = await escrow.isListed(1);
+      expect(result).to.be.equal(true);
+    });
     it("update the ownership", async () => {
-      expect(await realEstate.ownerOf(1).to.be.equal(escrow.address));
+      const newOwner = await realEstate.ownerOf(1);
+      expect(newOwner).to.be.equal(escrow.address);
     });
   });
 });
