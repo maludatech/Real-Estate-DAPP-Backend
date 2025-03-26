@@ -2,12 +2,10 @@
 pragma solidity ^0.8.28;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import {ERC721URIStorage, ERC721} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract RealEstate is ERC721URIStorage {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
+    uint256 private _nextTokenId;
 
     constructor() ERC721("RealEstateNFT", "REALE") {}
 
@@ -15,15 +13,14 @@ contract RealEstate is ERC721URIStorage {
         address recipient,
         string memory tokenURI
     ) public returns (uint256) {
-        _tokenIds.increment();
-        uint256 newItemId = _tokenIds.current();
-        _mint(recipient, newItemId);
-        _setTokenURI(newItemId, tokenURI);
+        uint256 tokenId = _nextTokenId++;
+        _mint(recipient, tokenId);
+        _setTokenURI(tokenId, tokenURI);
 
-        return newItemId;
+        return tokenId;
     }
 
     function totalSupply() public view returns (uint256) {
-        return _tokenIds.current();
+        return _nextTokenId;
     }
 }
