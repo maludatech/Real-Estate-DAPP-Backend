@@ -8,7 +8,7 @@ const tokens = (n: any) => {
 
 describe("Escrow", () => {
   let buyer: any, seller: any, inspector: any, lender: any;
-  let realEstate: any, escrow: any;
+  let realEstate: any, escrow: any, realEstateAddress: any, escrowAddress: any;
 
   beforeEach(async () => {
     // Setup accounts
@@ -29,15 +29,17 @@ describe("Escrow", () => {
 
     // Deploy Escrow
     const Escrow = await ethers.getContractFactory("Escrow");
+    realEstateAddress = await realEstate.getAddress();
     escrow = await Escrow.deploy(
-      await realEstate.getAddress(),
+      realEstateAddress,
       seller.address,
       inspector.address,
       lender.address
     );
+    escrowAddress = await escrow.getAddress();
 
     // Approve Property
-    transaction = await realEstate.connect(seller).approve(escrow.address, 1);
+    transaction = await realEstate.connect(seller).approve(escrowAddress, 1);
     await transaction.wait();
 
     // List Property
@@ -50,7 +52,7 @@ describe("Escrow", () => {
   describe("Deployment", () => {
     it("Returns NFT address", async () => {
       const result = await escrow.nftAddress();
-      expect(result).to.be.equal(realEstate.address);
+      expect(result).to.be.equal(realEstateAddress);
     });
 
     it("Returns seller", async () => {
