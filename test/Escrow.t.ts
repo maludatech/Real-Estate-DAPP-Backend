@@ -21,7 +21,8 @@ describe("Escrow", () => {
     // Mint
     let transaction = await realEstate
       .connect(seller)
-      .mint(
+      .mintNFT(
+        seller.address,
         "https://ipfs.io/ipfs/QmTudSYeM7mz3PkYEWXWqPjomRPHogcMFSq7XAvsvsgAPS"
       );
     await transaction.wait();
@@ -29,7 +30,7 @@ describe("Escrow", () => {
     // Deploy Escrow
     const Escrow = await ethers.getContractFactory("Escrow");
     escrow = await Escrow.deploy(
-      realEstate.address,
+      await realEstate.getAddress(),
       seller.address,
       inspector.address,
       lender.address
