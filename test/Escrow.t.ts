@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import "@nomicfoundation/hardhat-ethers";
 
 const tokens = (n: any) => {
-  return ethers.parseUnits(n.toString(), "ether");
+  return ethers.parseUnits(n, "ether");
 };
 
 describe("Escrow", () => {

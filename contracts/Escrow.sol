@@ -59,10 +59,7 @@ contract Escrow {
     function depositEarnest(uint256 _nftId) public payable onlyBuyer(_nftId) {
         require(msg.value >= escrowAmount[_nftId]);
     }
-    receive() external payable {}
-    function getBalance() public view returns (uint256) {
-        return address(this).balance;
-    }
+
     function updateInspectionStatus(
         uint256 _nftId,
         bool _passed
@@ -95,5 +92,18 @@ contract Escrow {
         require(success);
 
         IERC721(nftAddress).transferFrom(address(this), buyer[_nftID], _nftID);
+    }
+    // Cancel Sale (handle earnest deposit)
+    // -> if inspection status is not approved, then refund, otherwise send to seller
+    function cancelSale(uint256 _nftID) public {
+        if (inspectionPassed[_nftID] == false) {
+            payable(buyer[_nftID]).transfer(address(this).balance);
+        } else {
+            payable(seller).transfer(address(this).balance);
+        }
+    }
+    receive() external payable {}
+    function getBalance() public view returns (uint256) {
+        return address(this).balance;
     }
 }
