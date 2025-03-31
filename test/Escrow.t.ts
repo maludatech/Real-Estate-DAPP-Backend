@@ -2,14 +2,16 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import "@nomicfoundation/hardhat-ethers";
 
+// Global variables
+let buyer: any, seller: any, inspector: any, lender: any;
+let realEstate: any, escrow: any;
+let realEstateAddress: string, escrowAddress: string;
+
 const tokens = (n: any) => {
   return ethers.parseUnits(n, "ether");
 };
 
 describe("Escrow", () => {
-  let buyer: any, seller: any, inspector: any, lender: any;
-  let realEstate: any, escrow: any, realEstateAddress: any, escrowAddress: any;
-
   beforeEach(async () => {
     // Setup accounts
     [buyer, seller, inspector, lender] = await ethers.getSigners();
@@ -17,6 +19,7 @@ describe("Escrow", () => {
     // Deploy Real Estate
     const RealEstate = await ethers.getContractFactory("RealEstate");
     realEstate = await RealEstate.deploy();
+    realEstateAddress = await realEstate.getAddress();
 
     // Mint
     let transaction = await realEstate
@@ -29,7 +32,6 @@ describe("Escrow", () => {
 
     // Deploy Escrow
     const Escrow = await ethers.getContractFactory("Escrow");
-    realEstateAddress = await realEstate.getAddress();
     escrow = await Escrow.deploy(
       realEstateAddress,
       seller.address,
@@ -45,9 +47,11 @@ describe("Escrow", () => {
     // List Property
     transaction = await escrow
       .connect(seller)
-      .list(1, buyer.address, tokens(10), tokens(5));
+      .list(1, tokens(10), tokens(5), buyer.address);
     await transaction.wait();
   });
+
+  // ✅ Now all tests can access `buyer`, `seller`, `escrow`, `realEstate`, etc.
 
   describe("Deployment", () => {
     it("Returns NFT address", async () => {
