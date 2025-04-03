@@ -19,7 +19,7 @@ async function main() {
   // Deploy Real Estate
   const RealEstate = await ethers.getContractFactory("RealEstate");
   const realEstate = await RealEstate.deploy();
-  const realEstateAddress = realEstate.getAddress();
+  const realEstateAddress = await realEstate.getAddress();
 
   console.log(`Deployed Real Estate Contract at: ${realEstateAddress}`);
   console.log(`Minting 3 properties...\n`);
@@ -34,6 +34,12 @@ async function main() {
         }.json`
       );
     await transaction.wait();
+  }
+
+  //Double check ownership
+  for (let i = 0; i < 3; i++) {
+    const owner = await realEstate.ownerOf(i + 1);
+    console.log(`Token ${i + 1} owned by: ${owner}`);
   }
 
   // Deploy Escrow
